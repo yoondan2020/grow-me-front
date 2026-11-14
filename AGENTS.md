@@ -1,117 +1,109 @@
-This is an Expo/React Native mobile application. Prioritize mobile-first patterns, performance, and cross-platform compatibility.
-
-## Expo has changed — do not trust your training data
-
-Expo ships breaking changes every SDK release. APIs you remember are likely renamed, moved, or removed. Before writing any code that touches an Expo, EAS, or React Native API:
-
-1. Read the major version of the `expo` package in `package.json`.
-2. Fetch the matching versioned docs: `https://docs.expo.dev/versions/v<major>.0.0/`
-3. For anything else, fetch https://docs.expo.dev/llms.txt — an index of all Expo docs with corrections to common LLM misconceptions. Follow its links to the specific page you need; never answer from memory.
-
-## Commands
-
-Use `bunx` instead of `npx` if the project uses bun (`bun.lock` present).
-
-```bash
-npx expo install <package>  # ALWAYS use instead of npm/yarn/pnpm/bun add — resolves SDK-compatible versions
-npx expo start              # start the dev server
-npx expo lint               # lint
-npx tsc --noEmit            # typecheck
-npx expo-doctor             # diagnose dependency and config issues
-npx expo install --fix      # fix incompatible package versions
-```
-
-Run lint and typecheck before declaring any task done.
-
-## Navigation & Routing
-
-- Use **Expo Router** for all navigation. Routes live in `src/app/` — every file there is a screen, `_layout.tsx` files define navigators. Keep non-route code (components, hooks, utils) outside `src/app/`.
-- Import `Link`, `router`, and `useLocalSearchParams` from `expo-router`.
-- Docs: https://docs.expo.dev/router/introduction.md
-
-## Building with EAS
-
-Use EAS to build, sign, and submit the app in the cloud (`eas build`, `eas submit`) and to ship over-the-air updates (`eas update`) — no local Xcode or Android Studio required. Run EAS CLI as `bunx eas-cli <command>` in Bun projects, or `npx eas-cli@latest <command>` otherwise; substitute that for bare `eas` in docs examples.
-Docs: https://docs.expo.dev/eas/index.md
-
-## Rules
-
-- If `ios/` and `android/` directories do not exist, they are generated (Continuous Native Generation). Never create or edit them by hand — configure native behavior in `app.json` and config plugins.
-- Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build: `npx expo run:ios|android` locally, or `eas build --profile development`.
-- Prefer recommended Expo modules over third-party libraries, and check your available skills before adding dependencies. Docs: https://docs.expo.dev/versions/latest/index.md
-
 # AGENTS.md
 
-## 1. Project Overview
-- Project Name: GrowMe
-- Project Type: Personal Growth / Habit Tracking App
-- Goal: 사용자의 목표와 습관 형성을 식물의 성장 과정으로 표현하는 서비스
-- Target: Web and Mobile App
+## 목적과 우선순위
 
-## 2. Tech Stack
-- Language: TypeScript
-- Framework: React Native
-- Styling: NativeWind
-- Design: Figma
-- Backend: TBD
-- Database: TBD
+이 파일은 Codex가 GrowMe 저장소를 일관되고 안전하게 수정하기 위한 개발 규칙입니다. 제품 요구사항은 [Grow Me 기획서](https://app.notion.com/p/418c465da7ba80659845d3996c6bca2e)와 승인된 Figma 화면을 기준으로 합니다. 이 파일은 코딩 지침이며 미확정 제품 규칙을 새로 결정하지 않습니다.
 
-## 3. Project Structure
+## 프로젝트 개요
+
+- 프로젝트명: GrowMe
+- 유형: 사용자의 목표와 습관 형성을 식물 성장으로 표현하는 서비스
+- 대상: Web and Mobile App
+- 언어: TypeScript
+- 앱 프레임워크: React Native, Expo
+- 라우팅: Expo Router
+- 스타일링: NativeWind (프로젝트 설정 및 의존성 구성 대기 중)
+- Backend / Database: TBD
+
+## 현재 프로젝트 구조
+
+Expo Router의 파일 기반 경로 구조와 현재 저장소를 우선합니다.
+
+- src/app: 화면 경로와 라우트 레이아웃
 - src/components: 공통 UI 컴포넌트
-- src/screens: 화면 단위 컴포넌트
-- src/navigation: 화면 이동 및 네비게이션
 - src/hooks: Custom Hooks
-- src/services: API 통신
-- src/store: 전역 상태 관리
-- src/types: TypeScript 타입 정의
-- src/constants: 상수 및 설정값
-- src/assets: 이미지, 아이콘, 폰트
+- src/constants: 디자인 토큰 및 상수
+- src/services: API 및 외부 서비스 연결
+- src/store: 전역 상태 관리가 필요할 때 사용하는 상태 관리
+- src/types: 공유 TypeScript 타입
+- assets: 이미지, 아이콘, 폰트
 
-## 4. Coding Convention
+기존 구조와 맞지 않는 src/screens 또는 src/navigation을 중복으로 만들지 않습니다. 구조를 변경해야 하면 먼저 기존 라우트와 사용처를 파악하고 변경 범위를 설명합니다.
+
+## 코딩 규칙
 
 ### General
-- TypeScript를 기본 언어로 사용한다.
-- 가능한 한 명확한 타입을 선언한다.
-- any 사용을 지양한다.
-- 중복 코드는 공통 함수 또는 컴포넌트로 분리한다.
-- 기존 프로젝트의 코드 스타일을 우선적으로 따른다.
+
+- TypeScript를 기본 언어로 사용합니다.
+- 가능한 한 명확한 타입을 선언하고 any 사용을 지양합니다.
+- 중복 로직은 공통 함수나 컴포넌트로 분리합니다.
+- 기존 프로젝트의 코드 스타일과 Expo 설정을 우선합니다.
+- 모든 앱 내비게이션은 Expo Router를 사용합니다.
 
 ### Naming
-- Components: PascalCase
-- Functions and Variables: camelCase
-- Constants: UPPER_SNAKE_CASE
-- Custom Hooks: use 접두사 사용
+
+- 컴포넌트: PascalCase
+- 함수와 변수: camelCase
+- 상수: UPPER_SNAKE_CASE
+- Custom Hook: use 접두사
 
 ### Components
-- 하나의 컴포넌트는 하나의 주요 역할을 담당한다.
-- 화면 컴포넌트와 재사용 가능한 UI 컴포넌트를 구분한다.
-- 불필요한 컴포넌트 분리는 지양한다.
 
-## 5. UI / Styling Rules
-- NativeWind를 사용한다.
-- 가능한 한 공통 디자인 토큰을 활용한다.
-- Figma 디자인을 기준으로 UI를 구현한다.
-- 임의로 색상, 폰트, 간격을 변경하지 않는다.
-- 이미지 에셋은 기존 assets를 우선적으로 사용한다.
-- 플랫폼별 UI 차이를 고려한다.
+- 한 컴포넌트는 하나의 주요 역할을 담당합니다.
+- 화면 경로 컴포넌트와 재사용 UI 컴포넌트를 구분합니다.
+- 불필요하게 작은 컴포넌트로 나누지 않습니다.
 
-## 6. Development Rules
-- 기존 코드와 아키텍처를 먼저 파악한 후 수정한다.
-- 기존 기능에 영향을 주지 않도록 한다.
-- 새로운 라이브러리 설치 전 필요성을 설명하고 확인받는다.
-- API 호출 로직은 UI 컴포넌트와 분리한다.
-- 오류 처리를 명시적으로 구현한다.
-- 불필요한 코드 및 파일을 생성하지 않는다.
+## UI와 스타일링
 
-## 7. Working Process
-1. 작업 요청을 분석한다.
-2. 관련 파일과 기존 구현을 확인한다.
-3. 구현 계획을 간략하게 설명한다.
-4. 사용자 확인이 필요한 사항은 먼저 질문한다.
-5. 승인된 범위에서 코드를 수정한다.
-6. 변경 사항과 테스트 결과를 보고한다.
+- NativeWind 설정 후 유틸리티 클래스를 사용합니다.
+- 공통 디자인 토큰을 우선하고 승인된 색상, 폰트, 간격을 임의로 바꾸지 않습니다.
+- Figma 화면과 [DESIGN.md](./DESIGN.md)를 시각 기준으로 사용합니다.
+- 기존 이미지 에셋을 먼저 확인합니다.
+- 식물의 3D 아트 스타일은 정적 이미지로 표현합니다. 실제 3D 렌더링이나 조작 엔진은 추가하지 않습니다.
+- 첫 홈 화면에는 키우는 식물만 보여줍니다. 텍스트, 진행 수치, 카드, 할 일, 버튼, 내비게이션 등 다른 화면 요소를 배치하지 않습니다.
+- iOS 안전 영역과 터치 동작을 우선 고려하고 Web에서도 공통 UI가 유지되도록 합니다.
+- 색상만으로 상태를 전달하지 말고 라벨, 아이콘, 숫자, 모양을 함께 사용합니다.
 
-## 8. Git Convention
-- 의미 있는 단위로 커밋한다.
-- 기존 Git 커밋 메시지 규칙을 따른다.
-- 요청 없이 commit 또는 push하지 않는다.
+### Figma AI 디자인 요청
+
+디자인을 Figma AI로 다시 그릴 때 아래 요청을 최신 DESIGN.md와 첨부된 3D 식물 이미지 및 Toss 디자인 문서를 참고해 반영합니다.
+
+> 다음 디자인.md 파일을 바탕으로 다시 그려줘. 첨부한 이미지처럼의 3d 모양을 내고 싶어. 그리고 첫 홈 화면에는 다른 내용이 아닌 내가 키우는 식물만 보이게 해줘.
+
+첨부 자료는 시각 참고 자료입니다. GrowMe에 맞게 적용하고 Toss의 브랜드 색상, 로고, 고유 화면을 복제하지 않습니다.
+
+## 개발 규칙
+
+- 수정 전에 관련 코드와 현재 구조를 확인합니다.
+- 기존 기능과 라우트에 미치는 영향을 확인합니다.
+- 새 라이브러리 설치가 필요하면 목적, 대안, Expo 호환성을 설명하고 확인을 받습니다.
+- API 로직은 화면 컴포넌트에서 분리합니다.
+- 오류와 사용자 피드백 상태를 명시적으로 다룹니다.
+- 불필요한 파일이나 추상화를 추가하지 않습니다.
+- 미확정 제품 규칙을 임의로 확정하지 말고 질문 또는 결정 대기 항목으로 남깁니다.
+
+## 작업 흐름
+
+1. 요청 범위와 완료 조건을 파악합니다.
+2. 관련 파일, 문서, 기존 구현을 확인합니다.
+3. 변경 전 간단한 계획을 공유합니다.
+4. 사용자의 결정이 필요한 사항은 구현 전에 묻습니다.
+5. 승인된 범위에서 수정합니다.
+6. 요청된 검증을 수행하고 변경 사항과 결과를 보고합니다.
+
+## Git 규칙
+
+- 의미 있는 단위로 변경을 나눕니다.
+- 기존 커밋 메시지 관례를 따릅니다.
+- 요청 없이 commit 또는 push하지 않습니다.
+
+## Expo 및 플랫폼 규칙
+
+Expo API를 사용하는 코드 변경 전 package.json에서 Expo 주 버전을 확인하고 해당 버전의 Expo 문서를 참고합니다. Expo API는 버전마다 달라질 수 있으므로 기억에 의존하지 않습니다.
+
+- iOS와 Android 디렉터리가 없으면 Expo Continuous Native Generation으로 생성되는 것으로 간주합니다. 해당 디렉터리를 직접 만들거나 수정하지 말고 app.json과 config plugin을 사용합니다.
+- 네이티브 코드를 포함하는 라이브러리를 추가하면 Expo Go만으로 검증할 수 없을 수 있습니다. 개발 빌드 필요 여부를 확인합니다.
+- Expo와 호환되는 패키지는 Expo가 권장하는 설치 방식을 우선합니다.
+- Expo CLI 명령은 기존 프로젝트의 package manager와 lockfile에 맞춰 실행합니다.
+- 프로젝트에 bun.lock이 있으면 bunx를 사용하고, 현재 저장소처럼 npm lockfile을 사용하면 기존 npm/Expo 명령 관례를 따릅니다.
+
