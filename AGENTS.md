@@ -35,7 +35,7 @@ src/
 │   ├── ui/                       # ScreenFrame, PageHeading, ActionButton, AnimatedSplash(.web), ApiStatus(로딩·오류 안내)
 │   ├── navigation/               # BottomNavigation
 │   └── plants/                   # Plant, PlantArt, PlantWateringEffect(완료 시 3초 물 주기 연출),
-│                                 #   flowerImages(도감·상세 공용 꽃 이미지), plant.types
+│                                 #   flowerImages(서버 image_key별 꽃봉오리·개화 이미지, 꽃 추가 방법), plant.types
 │                                 #   (필요할 때 생성: PlantAmbientMotion, PlantGrowthTransition, usePlantMotion)
 ├── features/                     # 한 화면 전용 컴포넌트·훅
 │   ├── tasks/
@@ -57,7 +57,7 @@ src/
 └── utils/date.ts                 # 기기 현지 시간 기준 날짜 키(YYYY-MM-DD)·포맷 계산
 
 assets/images/
-├── growme/                       # 식물·꽃·상태바 이미지 (flower-daisy.png도 실제 그림은 블루벨)
+├── growme/                       # 식물·꽃·상태바 이미지 (plant-stage-bud/bloom은 동백. flower-daisy·flower-detail·flower-bluebell은 블루벨 그림이며 현재 미사용)
 └── nav/                          # 하단 탭 아이콘 ({화면}-{아이콘}.svg, 선택된 탭은 -active)
 ```
 

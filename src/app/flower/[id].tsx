@@ -2,7 +2,7 @@ import { Image } from 'expo-image';
 import { Link, useLocalSearchParams } from 'expo-router';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { getFlowerImage } from '@/components/plants/flowerImages';
+import { getFlowerImages } from '@/components/plants/flowerImages';
 import { ErrorNotice, LoadingIndicator } from '@/components/ui/ApiStatus';
 import { ScreenFrame } from '@/components/ui/ScreenFrame';
 import { FlowerInfoRow } from '@/features/flower-detail/components/FlowerInfoRow';
@@ -35,13 +35,13 @@ export default function FlowerDetailScreen() {
 }
 
 function FlowerDetail({ entry }: { entry: FlowerEntry }) {
-  const { flowerName, bloomDate, completionCount, collectionNumber, monthOrder, imageVariant } = entry;
+  const { flowerName, bloomDate, completionCount, collectionNumber, monthOrder, imageKey } = entry;
   const month = parseDateKey(`${entry.month}-01`);
   return (
     <>
       <Text style={styles.date}>{`${month.getFullYear()}년 ${month.getMonth() + 1}월의 성장 기록`}</Text>
       <View style={styles.art}>
-        <Image source={getFlowerImage(imageVariant)} contentFit="contain" style={styles.image} accessibilityLabel={`${flowerName} 이미지`} />
+        <Image source={getFlowerImages(imageKey).bloom} contentFit="contain" style={styles.image} accessibilityLabel={`${flowerName} 이미지`} />
         <View style={styles.badge}><Text style={styles.badgeText}>NO. {String(collectionNumber).padStart(3, '0')}</Text></View>
       </View>
       <Text style={styles.title}>{flowerName}</Text>

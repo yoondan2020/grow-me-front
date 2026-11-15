@@ -13,7 +13,7 @@ const PLANT_POSITION = { left: 43.24, top: 354.91 } as const;
  * 화면이 Figma 프레임보다 낮으면 하늘(위쪽)부터 잘라 식물과 땅이 항상 보이게 합니다.
  * stage가 null이면(서버에서 단계를 불러오는 중) 배경만 그립니다.
  */
-export function Plant({ stage }: { stage: PlantStage | null }) {
+export function Plant({ stage, flowerKey }: { stage: PlantStage | null; flowerKey?: string | null }) {
   return (
     <View style={styles.viewport}>
       <View style={styles.scene}>
@@ -25,7 +25,7 @@ export function Plant({ stage }: { stage: PlantStage | null }) {
         />
         {stage ? (
           <View style={styles.plant}>
-            <PlantArt stage={stage} />
+            <PlantArt stage={stage} flowerKey={flowerKey} />
           </View>
         ) : null}
       </View>

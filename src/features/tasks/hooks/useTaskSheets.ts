@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { ApiError } from '@/services/apiClient';
+import type { FlowerEntry } from '@/store/flowerList';
 import { useGrowMe, type DayTask, type EditScope } from '@/store/GrowMeContext';
 import { DAILY_TASK_LIMIT } from '@/store/taskSchedule';
 import { addDays, formatMonthDay } from '@/utils/date';
@@ -25,6 +26,8 @@ export function useTaskSheets(selectedDate: string) {
   const [scopeAction, setScopeAction] = useState<ScopeAction>('edit');
   /** 물 주기 연출 재생 번호. null이면 재생하지 않습니다. 연달아 완료하면 번호가 바뀌어 처음부터 다시 재생합니다. */
   const [wateringKey, setWateringKey] = useState<number | null>(null);
+  /** 방금 핀 꽃. 물 주기 연출이 끝나면 개화 시트로 보여줍니다. */
+  const [bloomedFlower, setBloomedFlower] = useState<FlowerEntry | null>(null);
   const [bloomAfterWatering, setBloomAfterWatering] = useState(false);
   /** 서버에 저장하는 중. 중복 요청을 막습니다. */
   const [saving, setSaving] = useState(false);
@@ -121,11 +124,14 @@ export function useTaskSheets(selectedDate: string) {
     await runSaving(action, setActionError);
   };
   const complete = async (task: DayTask) => {
-    let bloomed = false;
+    let bloomed: FlowerEntry | null = null;
     const saved = await runSaving(async () => { bloomed = await toggleTask(task); }, setActionError);
     if (!saved || task.completed) return; // 실패하거나 완료 취소면 연출이 없습니다.
     // 완료하면 물 주기 연출을 먼저 보여주고, 꽃이 피었다면 연출이 끝난 뒤 개화 시트를 엽니다.
-    if (bloomed) setBloomAfterWatering(true);
+    if (bloomed) {
+      setBloomedFlower(bloomed);
+      setBloomAfterWatering(true);
+    }
     setWateringKey((key) => (key ?? 0) + 1);
   };
   const finishWatering = () => {
@@ -140,7 +146,7 @@ export function useTaskSheets(selectedDate: string) {
     sheet, value, setValue, activeTask, isEditing: editing !== null,
     formDate, changeFormDate, formError,
     repeatDaily, setRepeatDaily, repeatEndDate, changeRepeatEndDate, scopeAction,
-    wateringKey, finishWatering, saving,
+    wateringKey, finishWatering, saving, bloomedFlower,
     actionError, dismissActionError: () => setActionError(null),
     close, openNew, openActions, openEdit, requestDelete, confirmDelete, save, applyScope, complete,
   };

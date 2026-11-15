@@ -24,12 +24,14 @@ const DROP_COLOR = '#8FC2FF';
 
 type PlantWateringEffectProps = {
   stage: PlantStage;
+  /** 이달의 꽃 image_key. 꽃봉오리·개화 단계 이미지에 씁니다. */
+  flowerKey?: string | null;
   /** 연출이 끝나거나 사용자가 눌러 건너뛰면 호출됩니다. */
   onFinish: () => void;
 };
 
 /** 할 일을 완료했을 때 식물 위로 물방울이 떨어지는 3초 연출. 화면 위에 겹쳐 표시합니다. */
-export function PlantWateringEffect({ stage, onFinish }: PlantWateringEffectProps) {
+export function PlantWateringEffect({ stage, flowerKey, onFinish }: PlantWateringEffectProps) {
   const reduceMotion = useReducedMotion();
   const opacity = useSharedValue(0);
   const sway = useSharedValue(0);
@@ -69,7 +71,7 @@ export function PlantWateringEffect({ stage, onFinish }: PlantWateringEffectProp
         <View style={styles.card}>
           <View style={styles.scene}>
             <Animated.View style={[styles.plant, plantStyle]}>
-              <PlantArt stage={stage} />
+              <PlantArt stage={stage} flowerKey={flowerKey} />
             </Animated.View>
             {reduceMotion ? null : Array.from({ length: DROP_COUNT }, (_, index) => <WaterDrop key={index} index={index} />)}
           </View>

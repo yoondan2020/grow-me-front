@@ -40,7 +40,7 @@ export type CollectionEntryResponse = {
   collectionNumber: number;
   /** 그달 몇 번째로 핀 꽃인지(1부터) */
   monthOrder: number;
-  /** 달마다 번갈아 정하는 이미지 번호(0부터) */
+  /** 달마다 번갈아 정하는 번호(0부터). 화면 이미지는 imageKey로 고르므로 현재는 쓰지 않습니다. */
   imageVariant: number;
 };
 

@@ -77,9 +77,9 @@ export default function TasksScreen() {
         onClose={sheets.close}
       />
       {sheets.wateringKey !== null ? (
-        <PlantWateringEffect key={sheets.wateringKey} stage={plantStage ?? 'seed'} onFinish={sheets.finishWatering} />
+        <PlantWateringEffect key={sheets.wateringKey} stage={plantStage?.stage ?? 'seed'} flowerKey={plantStage?.flowerKey} onFinish={sheets.finishWatering} />
       ) : null}
-      <BloomSheet visible={sheets.sheet === 'bloom'} onClose={sheets.close} onViewFlower={() => { sheets.close(); router.push('/collection'); }} />
+      <BloomSheet visible={sheets.sheet === 'bloom'} flower={sheets.bloomedFlower} onClose={sheets.close} onViewFlower={() => { sheets.close(); router.push('/collection'); }} />
     </ScreenFrame>
   );
 }

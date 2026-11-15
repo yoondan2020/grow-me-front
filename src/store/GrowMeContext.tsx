@@ -1,6 +1,7 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
 
 import * as api from '@/services/growMeApi';
+import type { CollectionEntryResponse } from '@/types/api';
 
 import type { DayTask, EditScope } from './taskSchedule';
 
@@ -20,8 +21,8 @@ type GrowMeState = {
   /** 반복 할 일 전체의 제목과 기간을 바꿉니다. 새 기간 밖의 완료·건너뜀 기록은 서버가 정리합니다. */
   updateDailyPeriod: (task: DayTask, title: string, startDate: string, endDate: string) => Promise<void>;
   removeTask: (task: DayTask, scope: EditScope) => Promise<void>;
-  /** 완료 상태를 바꾸고, 이번 완료로 꽃이 피었으면 true를 반환합니다. 개화 판정은 서버가 합니다. */
-  toggleTask: (task: DayTask) => Promise<boolean>;
+  /** 완료 상태를 바꾸고, 이번 완료로 꽃이 피었으면 그 꽃 기록을, 아니면 null을 반환합니다. 개화 판정은 서버가 합니다. */
+  toggleTask: (task: DayTask) => Promise<CollectionEntryResponse | null>;
 };
 
 const GrowMeContext = createContext<GrowMeState | null>(null);
@@ -63,7 +64,7 @@ export function GrowMeProvider({ children }: { children: ReactNode }) {
           const result = dayTask.kind === 'single'
             ? await api.updateTask(dayTask.sourceId, { completed })
             : await api.changeOccurrenceCompletion(dayTask.sourceId, dayTask.date, completed);
-          return result.bloomed;
+          return result.bloomed ? result.bloom : null;
         }),
     };
   }, [revision]);

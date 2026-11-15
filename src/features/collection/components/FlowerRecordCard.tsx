@@ -2,17 +2,17 @@ import { Image } from 'expo-image';
 import { Link } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { getFlowerImage } from '@/components/plants/flowerImages';
+import { getFlowerImages } from '@/components/plants/flowerImages';
 import type { FlowerEntry } from '@/store/flowerList';
 import { formatFullDate } from '@/utils/date';
 
 export function FlowerRecordCard({ entry }: { entry: FlowerEntry }) {
-  const { flowerName, bloomDate, completionCount, monthOrder, imageVariant } = entry;
+  const { flowerName, bloomDate, completionCount, monthOrder, imageKey } = entry;
   return (
     <Link href={{ pathname: '/flower/[id]', params: { id: String(entry.id) } }} asChild>
       <Pressable style={styles.record} accessibilityRole="link">
         <View style={styles.thumb}>
-          <Image source={getFlowerImage(imageVariant)} contentFit="contain" style={styles.thumbImage} />
+          <Image source={getFlowerImages(imageKey).bloom} contentFit="contain" style={styles.thumbImage} accessibilityLabel={`${flowerName} 이미지`} />
         </View>
         <View style={styles.recordCopy}>
           <Text style={styles.recordTitle}>{flowerName}</Text>
