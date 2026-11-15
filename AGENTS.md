@@ -15,7 +15,7 @@
 - 스타일링: React Native StyleSheet (NativeWind·Tailwind CSS는 사용하지 않으며 패키지와 설정도 제거됨)
 - 주요 라이브러리: react-native-calendars(할 일 주간·월간 달력), react-native-reanimated(스플래시·물 주기 연출), expo-image
 - 상태 저장: React Context 메모리 상태만 사용(새로고침 시 초기화). 영구 저장 방식은 결정 대기
-- Backend / Database: TBD
+- Backend: Java, Spring boot / Database: Mysql
 
 ## 현재 프로젝트 구조
 

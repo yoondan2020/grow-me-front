@@ -26,8 +26,8 @@
 
 ## 3. 리소스 초안
 
-- Todo: 날짜, 제목, 완료 여부, 생성·수정 시각
-- DailyTodo: 제목, 시작일, 종료일, 제외 날짜 목록, 날짜별 완료 기록, 생성·수정 시각
+- Task: 날짜, 제목, 완료 여부, 생성·수정 시각
+- DailyTask: 제목, 시작일, 종료일, 제외 날짜 목록, 날짜별 완료 기록, 생성·수정 시각
 - MonthlyProgress: 연월, 완료 수, 식물 단계, 다음 개화까지의 수
 - BloomRecord: 개화 시점, 연월, 꽃 종류, 해당 월 완료 수
   - 도감 번호(전체 개화 순서)와 그달 몇 번째 꽃인지는 저장 필드가 아니라 개화 기록을 개화일 순으로 정렬해 계산하는 값입니다(현재 클라이언트 `src/store/flowerList.ts`).
@@ -41,14 +41,14 @@
 
 | Method | Path | 목적 |
 | --- | --- | --- |
-| GET | /v1/todos?date=YYYY-MM-DD | 날짜별 할 일 조회 |
-| POST | /v1/todos | 할 일 등록 |
-| PATCH | /v1/todos/{todoId} | 제목·날짜 수정 또는 완료 상태 변경 |
-| DELETE | /v1/todos/{todoId} | 할 일 삭제 |
-| POST | /v1/daily-todos | 매일 반복 할 일 등록(제목, 시작일, 종료일) |
-| PATCH | /v1/daily-todos/{dailyTodoId} | 반복 전체의 제목·시작일·종료일 변경 |
-| PATCH | /v1/daily-todos/{dailyTodoId}/occurrences/{date} | 해당 날짜 완료 상태 변경, 또는 scope=one/following으로 제목 수정 |
-| DELETE | /v1/daily-todos/{dailyTodoId}/occurrences/{date}?scope=one\|following | 이 날만 또는 이 날 이후 모두 삭제 |
+| GET | /v1/tasks?date=YYYY-MM-DD | 날짜별 할 일 조회 |
+| POST | /v1/tasks | 할 일 등록 |
+| PATCH | /v1/tasks/{taskId} | 제목·날짜 수정 또는 완료 상태 변경 |
+| DELETE | /v1/tasks/{taskId} | 할 일 삭제 |
+| POST | /v1/daily-tasks | 매일 반복 할 일 등록(제목, 시작일, 종료일) |
+| PATCH | /v1/daily-tasks/{dailyTaskId} | 반복 전체의 제목·시작일·종료일 변경 |
+| PATCH | /v1/daily-tasks/{dailyTaskId}/occurrences/{date} | 해당 날짜 완료 상태 변경, 또는 scope=one/following으로 제목 수정 |
+| DELETE | /v1/daily-tasks/{dailyTaskId}/occurrences/{date}?scope=one\|following | 이 날만 또는 이 날 이후 모두 삭제 |
 | GET | /v1/progress/monthly?month=YYYY-MM | 월간 진행과 식물 단계 조회 |
 | GET | /v1/collection?sort=latest\|oldest | 개화 기록 조회(기본 최신순, 연도별 구역은 클라이언트에서 구성) |
 | GET | /v1/collection/{bloomId} | 개화 기록 상세 조회 |
@@ -58,7 +58,7 @@
 - 등록 요청과 다른 날짜로 옮기는 수정 요청은 대상 날짜에 표시되는 항목(매일 반복 포함)이 이미 5개면 거부해야 합니다.
 - 반복 할 일의 기간을 바꾸면 새 기간 밖의 날짜별 완료·제외 기록은 정리하고, 이미 핀 꽃은 보존해야 합니다.
 - 제목은 공백이 아닌 값이어야 하며 최대 40자입니다.
-- Todo 완료·취소·삭제에 따른 월간 수와 단계는 일관되게 재계산해야 합니다.
+- Task 완료·취소·삭제에 따른 월간 수와 단계는 일관되게 재계산해야 합니다.
 - 꽃 보상은 (연월, 해당 월 완료 수) 조합당 한 번만 생성해야 합니다. 동일 요청 재전송, 빠른 연속 완료, 완료 취소 후 재완료로 같은 임계 완료 수에 다시 도달해도 중복 생성하지 않습니다. 클라이언트는 현재 이 규칙으로 중복을 막고 있습니다.
 - API를 도입한다면 사용자 입력을 보존하는 오류 응답을 정의해야 합니다.
 
