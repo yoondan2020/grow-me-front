@@ -19,14 +19,44 @@
 
 Expo Router의 파일 기반 경로 구조와 현재 저장소를 우선합니다.
 
-- src/app: 화면 경로와 라우트 레이아웃
-- src/components: 공통 UI 컴포넌트
-- src/hooks: Custom Hooks
-- src/constants: 디자인 토큰 및 상수
-- src/services: API 및 외부 서비스 연결
-- src/store: 전역 상태 관리가 필요할 때 사용하는 상태 관리
-- src/types: 공유 TypeScript 타입
-- assets: 이미지, 아이콘, 폰트
+```
+src/
+├── app/                      # Expo Router 경로. 화면 조립만 담당
+│   ├── _layout.tsx
+│   ├── index.tsx             # 홈
+│   ├── tasks.tsx             # 할 일
+│   ├── collection.tsx        # 도감
+│   ├── profile.tsx           # 마이페이지
+│   ├── terms.tsx             # 이용약관
+│   └── flower/[id].tsx       # 꽃 상세
+├── components/               # 두 화면 이상에서 쓰는 공통 UI
+│   ├── ui/                   # ScreenFrame, PageHeading, ActionButton, AnimatedSplash
+│   ├── navigation/           # BottomNavigation
+│   └── plants/               # Plant, PlantArt, plant.types
+│                             #   (필요할 때 생성: PlantAmbientMotion, PlantWateringEffect,
+│                             #    PlantGrowthTransition, usePlantMotion)
+├── features/                 # 한 화면 전용 컴포넌트·훅
+│   ├── home/hooks/
+│   ├── tasks/components/ · hooks/ · constants.ts
+│   ├── collection/components/
+│   ├── flower-detail/components/
+│   └── profile/components/
+├── store/GrowMeContext.tsx   # 전역 상태와 GrowTask·FlowerRecord 타입
+├── hooks/                    # (필요할 때 생성) 기능 간 공유 훅
+├── constants/theme.ts        # 디자인 토큰
+├── utils/                    # (필요할 때 생성) date.ts 등 공통 계산
+├── global.css                # NativeWind 지시문·웹 변수
+└── nativewind-env.d.ts
+
+assets/images/
+├── growme/                   # 식물·꽃·상태바 이미지
+└── nav/                      # 하단 탭 아이콘 ({화면}-{아이콘}.svg, 선택된 탭은 -active)
+```
+
+- 경로가 아닌 파일은 src/app에 두지 않습니다.
+- 한 화면에서만 쓰는 코드는 features/{화면}/에, 두 화면 이상에서 쓰면 components/로 올립니다.
+- 빈 폴더나 빈 파일을 미리 만들지 않고, 첫 파일이 생길 때 폴더를 만듭니다.
+- API 연결이 생기면 src/services, 화면 간 공유 타입이 늘어나면 src/types를 추가합니다.
 
 기존 구조와 맞지 않는 src/screens 또는 src/navigation을 중복으로 만들지 않습니다. 구조를 변경해야 하면 먼저 기존 라우트와 사용처를 파악하고 변경 범위를 설명합니다.
 
@@ -42,7 +72,9 @@ Expo Router의 파일 기반 경로 구조와 현재 저장소를 우선합니�
 
 ### Naming
 
-- 컴포넌트: PascalCase
+- 컴포넌트: PascalCase (파일명도 `ScreenFrame.tsx`처럼 PascalCase)
+- Custom Hook 파일: `usePlantStage.ts`처럼 camelCase
+- src/app 경로 파일: URL이 되므로 소문자 (`tasks.tsx`, `flower/[id].tsx`)
 - 함수와 변수: camelCase
 - 상수: UPPER_SNAKE_CASE
 - Custom Hook: use 접두사
@@ -93,9 +125,26 @@ Expo Router의 파일 기반 경로 구조와 현재 저장소를 우선합니�
 
 ## Git 규칙
 
-- 의미 있는 단위로 변경을 나눕니다.
-- 기존 커밋 메시지 관례를 따릅니다.
-- 요청 없이 commit 또는 push하지 않습니다.
+- 논리적인 작업 하나당 커밋 하나로 나눕니다.
+- 사용자의 명시적인 요청 없이 commit 또는 push하지 않습니다.
+- 커밋 전에 staged 변경 사항을 검토합니다.
+
+### 커밋 메시지
+
+- 형식: `type: 작업 내용`
+- 커밋 메시지는 한국어로, 짧고 내용을 알 수 있게 작성합니다.
+- 사용하는 type:
+
+| type | 용도 |
+| --- | --- |
+| feat | 새로운 기능 추가 |
+| fix | 버그 수정 |
+| refactor | 코드 구조 개선 |
+| style | UI 및 코드 스타일 변경 |
+| docs | 문서 수정 |
+| chore | 설정 및 기타 유지보수 |
+
+예: `feat: 할 일 완료 시 식물 성장 단계 반영`
 
 ## Expo 및 플랫폼 규칙
 
