@@ -1,6 +1,6 @@
 # API_SPEC.md
 
-> 상태: 제안 초안. Backend와 Database는 미정입니다. 아래 경로·모델은 API 논의를 위한 예시이며 승인된 계약이 아닙니다. 동작 요구는 [Grow Me 기획서](https://app.notion.com/p/418c465da7ba80659845d3996c6bca2e)를 따릅니다.
+> 상태: 아래 엔드포인트는 grow-me-back(Spring Boot + MySQL)에 모두 구현되어 있고 front가 `src/services/growMeApi.ts`로 호출합니다. 인증 없이 `default-user-id` 사용자로 처리합니다. 동작 요구는 [Grow Me 기획서](https://app.notion.com/p/418c465da7ba80659845d3996c6bca2e)를 따릅니다.
 
 ## 1. 확정된 제품 규칙
 
@@ -42,6 +42,7 @@
 | Method | Path | 목적 |
 | --- | --- | --- |
 | GET | /v1/tasks?date=YYYY-MM-DD | 날짜별 할 일 조회 |
+| GET | /v1/tasks/statuses?from=YYYY-MM-DD&to=YYYY-MM-DD | 달력 점 표시용 날짜별 완료 상태(최대 100일) |
 | POST | /v1/tasks | 할 일 등록 |
 | PATCH | /v1/tasks/{taskId} | 제목·날짜 수정 또는 완료 상태 변경 |
 | DELETE | /v1/tasks/{taskId} | 할 일 삭제 |

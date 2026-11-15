@@ -1,8 +1,9 @@
 import { useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 
 import { PlantWateringEffect } from '@/components/plants/PlantWateringEffect';
+import { ErrorNotice, LoadingIndicator } from '@/components/ui/ApiStatus';
 import { PageHeading } from '@/components/ui/PageHeading';
 import { ScreenFrame } from '@/components/ui/ScreenFrame';
 import { BloomSheet } from '@/features/tasks/components/BloomSheet';
@@ -12,26 +13,43 @@ import { TaskFormSheet } from '@/features/tasks/components/TaskFormSheet';
 import { TaskCalendar } from '@/features/tasks/components/TaskCalendar';
 import { TaskList } from '@/features/tasks/components/TaskList';
 import { useTaskSheets } from '@/features/tasks/hooks/useTaskSheets';
+import { useDateStatuses, useDayTasks } from '@/hooks/useGrowMeQueries';
 import { usePlantStage } from '@/hooks/usePlantStage';
-import { useGrowMe } from '@/store/GrowMeContext';
-import { getDateStatuses, getDayTasks } from '@/store/taskSchedule';
 import { todayKey } from '@/utils/date';
 
+const NO_STATUSES = {};
+
 export default function TasksScreen() {
-  const { tasks, dailyTasks } = useGrowMe();
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState(todayKey);
+  /** 월간 달력에서 날짜를 고르지 않고 넘겨 본 달. 날짜를 고르면 선택한 날짜의 달로 돌아갑니다. */
+  const [browsingDate, setBrowsingDate] = useState<string | null>(null);
   const sheets = useTaskSheets(selectedDate);
   const plantStage = usePlantStage();
-  const dayTasks = getDayTasks(tasks, dailyTasks, selectedDate);
-  const dateStatuses = useMemo(() => getDateStatuses(tasks, dailyTasks), [tasks, dailyTasks]);
+  const dayTasks = useDayTasks(selectedDate);
+  const dateStatuses = useDateStatuses(browsingDate ?? selectedDate);
+  const selectDate = (date: string) => {
+    setSelectedDate(date);
+    setBrowsingDate(null);
+  };
 
   return (
     <ScreenFrame activeTab="tasks">
       <PageHeading title="할 일" subtitle="오늘도 나만의 속도로 자라요." />
-      <TaskCalendar dateStatuses={dateStatuses} selectedDate={selectedDate} onSelectDate={setSelectedDate}>
+      <TaskCalendar
+        dateStatuses={dateStatuses.data ?? NO_STATUSES}
+        selectedDate={selectedDate}
+        onSelectDate={selectDate}
+        onVisibleMonthChange={setBrowsingDate}>
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-          <TaskList dayTasks={dayTasks} selectedDate={selectedDate} onComplete={sheets.complete} onOpenActions={sheets.openActions} onAdd={sheets.openNew} />
+          {sheets.actionError ? <ErrorNotice error={sheets.actionError} onDismiss={sheets.dismissActionError} /> : null}
+          {dayTasks.data ? (
+            <TaskList dayTasks={dayTasks.data} selectedDate={selectedDate} onComplete={sheets.complete} onOpenActions={sheets.openActions} onAdd={sheets.openNew} />
+          ) : dayTasks.error ? (
+            <ErrorNotice error={dayTasks.error} onRetry={() => { dayTasks.reload(); dateStatuses.reload(); }} />
+          ) : (
+            <LoadingIndicator label="할 일을 불러오는 중이에요" />
+          )}
         </ScrollView>
       </TaskCalendar>
       <TaskFormSheet
@@ -59,7 +77,7 @@ export default function TasksScreen() {
         onClose={sheets.close}
       />
       {sheets.wateringKey !== null ? (
-        <PlantWateringEffect key={sheets.wateringKey} stage={plantStage} onFinish={sheets.finishWatering} />
+        <PlantWateringEffect key={sheets.wateringKey} stage={plantStage ?? 'seed'} onFinish={sheets.finishWatering} />
       ) : null}
       <BloomSheet visible={sheets.sheet === 'bloom'} onClose={sheets.close} onViewFlower={() => { sheets.close(); router.push('/collection'); }} />
     </ScreenFrame>

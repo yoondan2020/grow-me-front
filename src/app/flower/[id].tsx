@@ -3,51 +3,61 @@ import { Link, useLocalSearchParams } from 'expo-router';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { getFlowerImage } from '@/components/plants/flowerImages';
+import { ErrorNotice, LoadingIndicator } from '@/components/ui/ApiStatus';
 import { ScreenFrame } from '@/components/ui/ScreenFrame';
 import { FlowerInfoRow } from '@/features/flower-detail/components/FlowerInfoRow';
-import { findFlowerEntry, type FlowerEntry } from '@/store/flowerList';
-import { useGrowMe } from '@/store/GrowMeContext';
+import { useCollectionEntry } from '@/hooks/useGrowMeQueries';
+import { ApiError } from '@/services/apiClient';
+import type { FlowerEntry } from '@/store/flowerList';
 import { formatFullDate, parseDateKey } from '@/utils/date';
 
 export default function FlowerDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { flowers } = useGrowMe();
-  const entry = findFlowerEntry(flowers, id);
+  const entry = useCollectionEntry(id);
+  const notFound = !id || (entry.error instanceof ApiError && entry.error.status === 404);
 
   return (
     <ScreenFrame activeTab="collection">
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.heading}><Link href="/collection" style={styles.back}>‹</Link><Text style={styles.headingTitle}>나의 도감</Text></View>
-        {entry ? <FlowerDetail entry={entry} /> : <FlowerNotFound />}
+        {entry.data ? (
+          <FlowerDetail entry={entry.data} />
+        ) : notFound ? (
+          <FlowerNotFound />
+        ) : entry.error ? (
+          <ErrorNotice error={entry.error} onRetry={entry.reload} />
+        ) : (
+          <LoadingIndicator label="꽃 기록을 불러오는 중이에요" />
+        )}
       </ScrollView>
     </ScreenFrame>
   );
 }
 
 function FlowerDetail({ entry }: { entry: FlowerEntry }) {
-  const { flower, collectionNumber, monthOrder, imageVariant } = entry;
-  const month = parseDateKey(`${flower.month}-01`);
+  const { flowerName, bloomDate, completionCount, collectionNumber, monthOrder, imageVariant } = entry;
+  const month = parseDateKey(`${entry.month}-01`);
   return (
     <>
       <Text style={styles.date}>{`${month.getFullYear()}년 ${month.getMonth() + 1}월의 성장 기록`}</Text>
       <View style={styles.art}>
-        <Image source={getFlowerImage(imageVariant)} contentFit="contain" style={styles.image} accessibilityLabel={`${flower.name} 이미지`} />
+        <Image source={getFlowerImage(imageVariant)} contentFit="contain" style={styles.image} accessibilityLabel={`${flowerName} 이미지`} />
         <View style={styles.badge}><Text style={styles.badgeText}>NO. {String(collectionNumber).padStart(3, '0')}</Text></View>
       </View>
-      <Text style={styles.title}>{flower.name}</Text>
+      <Text style={styles.title}>{flowerName}</Text>
       <Text style={styles.description}>
         {monthOrder === 1 ? '작은 실천이 모여 피어난, 포근한 첫 마음.' : '꾸준한 실천이 더해져, 같은 꽃이 한 송이 더 피었어요.'}
       </Text>
       <View style={styles.info}>
-        <FlowerInfoRow label="꽃 이름" value={flower.name} />
-        <FlowerInfoRow label="개화일" value={formatFullDate(flower.date)} />
-        <FlowerInfoRow label="월 완료 수" value={`${flower.completions}개 · 이달의 ${monthOrder}번째 꽃`} />
+        <FlowerInfoRow label="꽃 이름" value={flowerName} />
+        <FlowerInfoRow label="개화일" value={formatFullDate(bloomDate)} />
+        <FlowerInfoRow label="월 완료 수" value={`${completionCount}개 · 이달의 ${monthOrder}번째 꽃`} />
       </View>
     </>
   );
 }
 
-/** 잘못된 링크이거나 새로고침으로 기록이 사라져 꽃을 찾을 수 없을 때 */
+/** 잘못된 링크라서 서버에 꽃 기록이 없을 때 */
 function FlowerNotFound() {
   return (
     <View style={styles.notFound}>

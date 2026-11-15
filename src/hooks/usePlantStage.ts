@@ -1,18 +1,14 @@
 import type { PlantStage } from '@/components/plants/plant.types';
-import { useGrowMe } from '@/store/GrowMeContext';
-import { countMonthCompletions } from '@/store/taskSchedule';
-import { monthKey, todayKey } from '@/utils/date';
+import { todayKey } from '@/utils/date';
 
-/** PRD 월간 성장 기준: 0–4 씨앗, 5–9 새싹, 10–14 성장, 15–19 꽃봉오리, 20 이상 개화. */
-export function getPlantStage(monthCompletions: number): PlantStage {
-  if (monthCompletions >= 20) return 'bloom';
-  if (monthCompletions >= 15) return 'bud';
-  if (monthCompletions >= 10) return 'growth';
-  if (monthCompletions >= 5) return 'sprout';
-  return 'seed';
-}
+import { useMonthlyProgress } from './useGrowMeQueries';
 
-export function usePlantStage(): PlantStage {
-  const { tasks, dailyTasks } = useGrowMe();
-  return getPlantStage(countMonthCompletions(tasks, dailyTasks, monthKey(todayKey())));
+/**
+ * 이번 달 식물 단계. 서버가 월간 완료 수로 계산합니다(0–4 씨앗, 5–9 새싹, 10–14 성장, 15–19 꽃봉오리, 20 이상 개화).
+ * 처음 불러오는 중에는 null이고, 불러오지 못하면 씨앗으로 보여줍니다.
+ */
+export function usePlantStage(): PlantStage | null {
+  const { data, error } = useMonthlyProgress(todayKey());
+  if (data) return data.stage;
+  return error ? 'seed' : null;
 }

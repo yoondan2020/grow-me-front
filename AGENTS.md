@@ -14,7 +14,7 @@
 - 라우팅: Expo Router
 - 스타일링: React Native StyleSheet (NativeWind·Tailwind CSS는 사용하지 않으며 패키지와 설정도 제거됨)
 - 주요 라이브러리: react-native-calendars(할 일 주간·월간 달력), react-native-reanimated(스플래시·물 주기 연출), expo-image
-- 상태 저장: React Context 메모리 상태만 사용(새로고침 시 초기화). 영구 저장 방식은 결정 대기
+- 상태 저장: 서버(grow-me-back) API로 MySQL에 저장. Base URL은 `.env`의 `EXPO_PUBLIC_API_BASE_URL`(`.env.example` 참고)
 - Backend: Java, Spring boot / Database: Mysql
 
 ## 현재 프로젝트 구조
@@ -32,7 +32,7 @@ src/
 │   ├── terms.tsx                 # 이용약관
 │   └── flower/[id].tsx           # 꽃 상세
 ├── components/                   # 두 화면 이상에서 쓰는 공통 UI
-│   ├── ui/                       # ScreenFrame, PageHeading, ActionButton, AnimatedSplash(.web)
+│   ├── ui/                       # ScreenFrame, PageHeading, ActionButton, AnimatedSplash(.web), ApiStatus(로딩·오류 안내)
 │   ├── navigation/               # BottomNavigation
 │   └── plants/                   # Plant, PlantArt, PlantWateringEffect(완료 시 3초 물 주기 연출),
 │                                 #   flowerImages(도감·상세 공용 꽃 이미지), plant.types
@@ -47,10 +47,12 @@ src/
 │   ├── flower-detail/components/ # FlowerInfoRow
 │   └── profile/components/       # ProfileMenu
 ├── store/                        # 전역 상태와 화면 공용 계산
-│   ├── GrowMeContext.tsx         # 할 일·매일 반복 할 일·꽃 상태와 액션 (최신 상태 ref로 완료 수 계산)
-│   ├── taskSchedule.ts           # 날짜별 할 일, 하루 한도, 달력 점 상태, 월간 완료 수
-│   └── flowerList.ts             # 도감 번호·월 순서·이미지 번호·연도 구역·정렬
-├── hooks/usePlantStage.ts        # 홈·할 일 공용 식물 단계 훅
+│   ├── GrowMeContext.tsx         # 할 일 변경 액션(API 호출) + 변경 후 재조회용 revision
+│   ├── taskSchedule.ts           # 할 일 타입, 하루 한도 상수, 달력 점 조회 범위 (목록·한도·완료 수 계산은 서버)
+│   └── flowerList.ts             # 도감 연도 구역·정렬 (번호·이미지 번호는 서버 계산)
+├── services/                     # apiClient(fetch·ApiError), growMeApi(엔드포인트별 함수)
+├── types/api.ts                  # API 응답 타입
+├── hooks/                        # useGrowMeQueries(서버 조회 훅: 로딩·오류·재시도), usePlantStage(월간 진행 API의 식물 단계)
 ├── constants/theme.ts            # 토큰 파일(Expo 템플릿 값). 현재 화면에서는 사용하지 않음
 └── utils/date.ts                 # 기기 현지 시간 기준 날짜 키(YYYY-MM-DD)·포맷 계산
 
@@ -63,9 +65,8 @@ assets/images/
 - 한 화면에서만 쓰는 코드는 features/{화면}/에, 두 화면 이상에서 쓰면 components/로 올립니다.
 - 두 화면 이상에서 쓰는 UI가 아닌 계산 로직은 src/store(상태·도메인 계산), src/utils(날짜 등 범용 계산), src/hooks(공유 훅)에 둡니다.
 - 날짜는 `src/utils/date.ts`의 `YYYY-MM-DD` 날짜 키로 다루고, 날짜 문자열을 화면에서 직접 자르거나 하드코딩하지 않습니다.
-- 상태 변경은 GrowMeContext 액션으로만 하고, 날짜별 할 일·한도·월간 완료 수는 `taskSchedule.ts` 함수로 계산합니다.
+- 상태 변경은 GrowMeContext 액션으로만 하고, 조회는 `useGrowMeQueries` 훅으로 합니다. 날짜별 할 일·한도·월간 완료 수·개화 판정은 서버가 계산합니다.
 - 빈 폴더나 빈 파일을 미리 만들지 않고, 첫 파일이 생길 때 폴더를 만듭니다.
-- API 연결이 생기면 src/services, 화면 간 공유 타입이 늘어나면 src/types를 추가합니다.
 
 기존 구조와 맞지 않는 src/screens 또는 src/navigation을 중복으로 만들지 않습니다. 구조를 변경해야 하면 먼저 기존 라우트와 사용처를 파악하고 변경 범위를 설명합니다.
 

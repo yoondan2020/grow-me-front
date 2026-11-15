@@ -47,3 +47,14 @@ export function formatMonthDay(dateKey: string): string {
   const date = parseDateKey(dateKey);
   return `${date.getMonth() + 1}월 ${date.getDate()}일`;
 }
+
+/** 그달 1일의 날짜 키 */
+export function startOfMonthKey(dateKey: string): string {
+  return `${monthKey(dateKey)}-01`;
+}
+
+/** 그달 말일의 날짜 키 */
+export function endOfMonthKey(dateKey: string): string {
+  const date = parseDateKey(dateKey);
+  return toDateKey(new Date(date.getFullYear(), date.getMonth() + 1, 0));
+}

@@ -12,6 +12,8 @@ type TaskCalendarProps = {
   dateStatuses: Record<string, DateStatus>;
   selectedDate: string;
   onSelectDate: (date: string) => void;
+  /** 월간 달력에서 날짜를 고르지 않고 다른 달로 넘겼을 때, 그달 1일의 날짜 키 */
+  onVisibleMonthChange?: (dateKey: string) => void;
   children: ReactNode;
 };
 
@@ -20,7 +22,7 @@ type TaskCalendarProps = {
  * ExpandableCalendar는 react-native-web에서 항상 스크린 리더 모드로 바뀌어 접힘이 동작하지 않으므로
  * WeekCalendar와 Calendar를 직접 전환합니다.
  */
-export function TaskCalendar({ dateStatuses, selectedDate, onSelectDate, children }: TaskCalendarProps) {
+export function TaskCalendar({ dateStatuses, selectedDate, onSelectDate, onVisibleMonthChange, children }: TaskCalendarProps) {
   const [expanded, setExpanded] = useState(false);
   // WeekCalendar는 기본적으로 창 전체 폭을 쓰므로 화면 프레임(최대 390px)의 실제 폭을 재서 넘깁니다.
   // 폭을 재기 전(웹 서버 렌더링 포함)에는 달력을 그리지 않아 hydration 불일치를 피합니다.
@@ -66,6 +68,7 @@ export function TaskCalendar({ dateStatuses, selectedDate, onSelectDate, childre
             markedDates={markedDates}
             theme={CALENDAR_THEME}
             enableSwipeMonths
+            onMonthChange={(month) => onVisibleMonthChange?.(month.dateString)}
             onDayPress={(day) => selectFromMonth(day.dateString)}
           />
         ) : null}

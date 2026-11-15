@@ -7,17 +7,17 @@ import type { FlowerEntry } from '@/store/flowerList';
 import { formatFullDate } from '@/utils/date';
 
 export function FlowerRecordCard({ entry }: { entry: FlowerEntry }) {
-  const { flower, monthOrder, imageVariant } = entry;
+  const { flowerName, bloomDate, completionCount, monthOrder, imageVariant } = entry;
   return (
-    <Link href={{ pathname: '/flower/[id]', params: { id: flower.id } }} asChild>
+    <Link href={{ pathname: '/flower/[id]', params: { id: String(entry.id) } }} asChild>
       <Pressable style={styles.record} accessibilityRole="link">
         <View style={styles.thumb}>
           <Image source={getFlowerImage(imageVariant)} contentFit="contain" style={styles.thumbImage} />
         </View>
         <View style={styles.recordCopy}>
-          <Text style={styles.recordTitle}>{flower.name}</Text>
-          <Text style={styles.recordDate}>첫 개화 {formatFullDate(flower.date)}</Text>
-          <Text style={styles.recordMeta}>완료 {flower.completions}개 · 꽃 {monthOrder}송이</Text>
+          <Text style={styles.recordTitle}>{flowerName}</Text>
+          <Text style={styles.recordDate}>첫 개화 {formatFullDate(bloomDate)}</Text>
+          <Text style={styles.recordMeta}>완료 {completionCount}개 · 꽃 {monthOrder}송이</Text>
         </View>
         <Text style={styles.arrow}>›</Text>
       </Pressable>

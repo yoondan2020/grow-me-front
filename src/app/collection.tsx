@@ -2,24 +2,28 @@ import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { ErrorNotice, LoadingIndicator } from '@/components/ui/ApiStatus';
 import { PageHeading } from '@/components/ui/PageHeading';
 import { ScreenFrame } from '@/components/ui/ScreenFrame';
 import { CollectionEmpty } from '@/features/collection/components/CollectionEmpty';
 import { FlowerRecordCard } from '@/features/collection/components/FlowerRecordCard';
+import { useCollection } from '@/hooks/useGrowMeQueries';
 import { groupFlowersByYear, type FlowerSort } from '@/store/flowerList';
-import { useGrowMe } from '@/store/GrowMeContext';
 
 export default function CollectionScreen() {
-  const { flowers } = useGrowMe();
+  const collection = useCollection();
+  const flowers = collection.data;
   const [sort, setSort] = useState<FlowerSort>('latest');
-  const sections = useMemo(() => groupFlowersByYear(flowers, sort), [flowers, sort]);
+  const sections = useMemo(() => groupFlowersByYear(flowers ?? [], sort), [flowers, sort]);
   const toggleSort = () => setSort((current) => (current === 'latest' ? 'oldest' : 'latest'));
   const router = useRouter();
   return (
     <ScreenFrame activeTab="collection">
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <PageHeading title="나의 도감" subtitle="차곡차곡 피워낸 나의 작은 성취" />
-        {flowers.length === 0 ? (
+        {!flowers ? (
+          collection.error ? <ErrorNotice error={collection.error} onRetry={collection.reload} /> : <LoadingIndicator label="도감을 불러오는 중이에요" />
+        ) : flowers.length === 0 ? (
           <CollectionEmpty onStart={() => router.push('/tasks')} />
         ) : (
           <>
@@ -42,7 +46,7 @@ export default function CollectionScreen() {
                   ) : null}
                 </View>
                 {section.entries.map((entry) => (
-                  <FlowerRecordCard key={entry.flower.id} entry={entry} />
+                  <FlowerRecordCard key={entry.id} entry={entry} />
                 ))}
               </View>
             ))}
