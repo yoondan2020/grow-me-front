@@ -12,7 +12,9 @@
 - 언어: TypeScript
 - 앱 프레임워크: React Native, Expo
 - 라우팅: Expo Router
-- 스타일링: NativeWind (프로젝트 설정 및 의존성 구성 대기 중)
+- 스타일링: React Native StyleSheet (NativeWind·Tailwind CSS는 사용하지 않으며 패키지와 설정도 제거됨)
+- 주요 라이브러리: react-native-calendars(할 일 주간·월간 달력), react-native-reanimated(스플래시·물 주기 연출), expo-image
+- 상태 저장: React Context 메모리 상태만 사용(새로고침 시 초기화). 영구 저장 방식은 결정 대기
 - Backend / Database: TBD
 
 ## 현재 프로젝트 구조
@@ -21,40 +23,47 @@ Expo Router의 파일 기반 경로 구조와 현재 저장소를 우선합니�
 
 ```
 src/
-├── app/                      # Expo Router 경로. 화면 조립만 담당
-│   ├── _layout.tsx
-│   ├── index.tsx             # 홈
-│   ├── tasks.tsx             # 할 일
-│   ├── collection.tsx        # 도감
-│   ├── profile.tsx           # 마이페이지
-│   ├── terms.tsx             # 이용약관
-│   └── flower/[id].tsx       # 꽃 상세
-├── components/               # 두 화면 이상에서 쓰는 공통 UI
-│   ├── ui/                   # ScreenFrame, PageHeading, ActionButton, AnimatedSplash
-│   ├── navigation/           # BottomNavigation
-│   └── plants/               # Plant, PlantArt, plant.types
-│                             #   (필요할 때 생성: PlantAmbientMotion, PlantWateringEffect,
-│                             #    PlantGrowthTransition, usePlantMotion)
-├── features/                 # 한 화면 전용 컴포넌트·훅
-│   ├── home/hooks/
-│   ├── tasks/components/ · hooks/ · constants.ts
-│   ├── collection/components/
-│   ├── flower-detail/components/
-│   └── profile/components/
-├── store/GrowMeContext.tsx   # 전역 상태와 GrowTask·FlowerRecord 타입
-├── hooks/                    # (필요할 때 생성) 기능 간 공유 훅
-├── constants/theme.ts        # 디자인 토큰
-├── utils/                    # (필요할 때 생성) date.ts 등 공통 계산
-├── global.css                # NativeWind 지시문·웹 변수
-└── nativewind-env.d.ts
+├── app/                          # Expo Router 경로. 화면 조립만 담당
+│   ├── _layout.tsx               # 테마 → GrowMeProvider → 스플래시 → Stack
+│   ├── index.tsx                 # 홈 (식물만 표시, 하단 탭 유지)
+│   ├── tasks.tsx                 # 할 일
+│   ├── collection.tsx            # 도감 (연도별 구역·정렬 전환)
+│   ├── profile.tsx               # 마이페이지
+│   ├── terms.tsx                 # 이용약관
+│   └── flower/[id].tsx           # 꽃 상세
+├── components/                   # 두 화면 이상에서 쓰는 공통 UI
+│   ├── ui/                       # ScreenFrame, PageHeading, ActionButton, AnimatedSplash(.web)
+│   ├── navigation/               # BottomNavigation
+│   └── plants/                   # Plant, PlantArt, PlantWateringEffect(완료 시 3초 물 주기 연출),
+│                                 #   flowerImages(도감·상세 공용 꽃 이미지), plant.types
+│                                 #   (필요할 때 생성: PlantAmbientMotion, PlantGrowthTransition, usePlantMotion)
+├── features/                     # 한 화면 전용 컴포넌트·훅
+│   ├── tasks/
+│   │   ├── components/           # TaskCalendar(주간↔월간), TaskList, TaskFormSheet,
+│   │   │                         #   TaskActionSheet, RepeatScopeSheet, BloomSheet
+│   │   ├── hooks/                # useTaskSheets(시트 상태, 물 주기 → 개화 시트 순서)
+│   │   └── calendarConfig.ts     # 달력 한국어 설정·테마·점 색상
+│   ├── collection/components/    # CollectionEmpty, FlowerRecordCard
+│   ├── flower-detail/components/ # FlowerInfoRow
+│   └── profile/components/       # ProfileMenu
+├── store/                        # 전역 상태와 화면 공용 계산
+│   ├── GrowMeContext.tsx         # 할 일·매일 반복 할 일·꽃 상태와 액션 (최신 상태 ref로 완료 수 계산)
+│   ├── taskSchedule.ts           # 날짜별 할 일, 하루 한도, 달력 점 상태, 월간 완료 수
+│   └── flowerList.ts             # 도감 번호·월 순서·이미지 번호·연도 구역·정렬
+├── hooks/usePlantStage.ts        # 홈·할 일 공용 식물 단계 훅
+├── constants/theme.ts            # 토큰 파일(Expo 템플릿 값). 현재 화면에서는 사용하지 않음
+└── utils/date.ts                 # 기기 현지 시간 기준 날짜 키(YYYY-MM-DD)·포맷 계산
 
 assets/images/
-├── growme/                   # 식물·꽃·상태바 이미지
-└── nav/                      # 하단 탭 아이콘 ({화면}-{아이콘}.svg, 선택된 탭은 -active)
+├── growme/                       # 식물·꽃·상태바 이미지 (flower-daisy.png도 실제 그림은 블루벨)
+└── nav/                          # 하단 탭 아이콘 ({화면}-{아이콘}.svg, 선택된 탭은 -active)
 ```
 
 - 경로가 아닌 파일은 src/app에 두지 않습니다.
 - 한 화면에서만 쓰는 코드는 features/{화면}/에, 두 화면 이상에서 쓰면 components/로 올립니다.
+- 두 화면 이상에서 쓰는 UI가 아닌 계산 로직은 src/store(상태·도메인 계산), src/utils(날짜 등 범용 계산), src/hooks(공유 훅)에 둡니다.
+- 날짜는 `src/utils/date.ts`의 `YYYY-MM-DD` 날짜 키로 다루고, 날짜 문자열을 화면에서 직접 자르거나 하드코딩하지 않습니다.
+- 상태 변경은 GrowMeContext 액션으로만 하고, 날짜별 할 일·한도·월간 완료 수는 `taskSchedule.ts` 함수로 계산합니다.
 - 빈 폴더나 빈 파일을 미리 만들지 않고, 첫 파일이 생길 때 폴더를 만듭니다.
 - API 연결이 생기면 src/services, 화면 간 공유 타입이 늘어나면 src/types를 추가합니다.
 
@@ -87,12 +96,13 @@ assets/images/
 
 ## UI와 스타일링
 
-- NativeWind 설정 후 유틸리티 클래스를 사용합니다.
+- 모든 스타일은 React Native `StyleSheet.create`로 작성합니다. NativeWind `className`, Tailwind 유틸리티 클래스, 별도 CSS 파일은 사용하지 않습니다.
+- 스타일 객체는 해당 컴포넌트 파일 하단의 `styles`에 두고, 두 곳 이상에서 쓰는 색상·간격 값은 `src/constants/theme.ts` 토큰으로 관리합니다.
 - 공통 디자인 토큰을 우선하고 승인된 색상, 폰트, 간격을 임의로 바꾸지 않습니다.
 - Figma 화면과 [DESIGN.md](./DESIGN.md)를 시각 기준으로 사용합니다.
 - 기존 이미지 에셋을 먼저 확인합니다.
 - 식물의 3D 아트 스타일은 정적 이미지로 표현합니다. 실제 3D 렌더링이나 조작 엔진은 추가하지 않습니다.
-- 첫 홈 화면에는 키우는 식물만 보여줍니다. 텍스트, 진행 수치, 카드, 할 일, 버튼, 내비게이션 등 다른 화면 요소를 배치하지 않습니다.
+- 첫 홈 화면의 콘텐츠 영역에는 키우는 식물만 보여줍니다. 텍스트, 진행 수치, 카드, 할 일, 버튼 등 다른 화면 요소를 배치하지 않습니다. 하단 탭 내비게이션은 홈에서도 항상 표시합니다.
 - iOS 안전 영역과 터치 동작을 우선 고려하고 Web에서도 공통 UI가 유지되도록 합니다.
 - 색상만으로 상태를 전달하지 말고 라벨, 아이콘, 숫자, 모양을 함께 사용합니다.
 
