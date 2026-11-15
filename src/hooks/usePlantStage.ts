@@ -1,9 +1,11 @@
 import type { PlantStage } from '@/components/plants/plant.types';
 import { useGrowMe } from '@/store/GrowMeContext';
+import { countMonthCompletions } from '@/store/taskSchedule';
+import { monthKey, todayKey } from '@/utils/date';
 
 export function usePlantStage(): PlantStage {
-  const { tasks, flowers } = useGrowMe();
+  const { tasks, dailyTasks, flowers } = useGrowMe();
   if (flowers.length > 0) return 'garden';
-  const completedThisMonth = tasks.filter((task) => task.date.startsWith('2026-11') && task.completed).length;
+  const completedThisMonth = countMonthCompletions(tasks, dailyTasks, monthKey(todayKey()));
   return completedThisMonth >= 5 ? 'bud' : 'sprout';
 }

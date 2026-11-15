@@ -1,6 +1,6 @@
 import { Plant } from '@/components/plants/Plant';
 import { ScreenFrame } from '@/components/ui/ScreenFrame';
-import { usePlantStage } from '@/features/home/hooks/usePlantStage';
+import { usePlantStage } from '@/hooks/usePlantStage';
 
 export default function HomeScreen() {
   const stage = usePlantStage();
