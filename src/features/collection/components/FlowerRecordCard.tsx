@@ -2,14 +2,23 @@ import { Image } from 'expo-image';
 import { Link } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import type { FlowerRecord } from '@/store/GrowMeContext';
+import { getFlowerImage } from '@/components/plants/flowerImages';
+import type { FlowerEntry } from '@/store/flowerList';
+import { formatFullDate } from '@/utils/date';
 
-export function FlowerRecordCard({ flower, index }: { flower: FlowerRecord; index: number }) {
+export function FlowerRecordCard({ entry }: { entry: FlowerEntry }) {
+  const { flower, monthOrder, imageVariant } = entry;
   return (
     <Link href={{ pathname: '/flower/[id]', params: { id: flower.id } }} asChild>
       <Pressable style={styles.record} accessibilityRole="link">
-        <View style={styles.thumb}><Image source={index % 2 === 0 ? require('@/assets/images/growme/flower-daisy.png') : require('@/assets/images/growme/flower-bluebell.png')} contentFit="contain" style={styles.thumbImage} /></View>
-        <View style={styles.recordCopy}><Text style={styles.recordTitle}>{flower.name}</Text><Text style={styles.recordDate}>첫 개화 {flower.date}</Text><Text style={styles.recordMeta}>완료 {flower.completions}개 · 꽃 {index + 1}송이</Text></View>
+        <View style={styles.thumb}>
+          <Image source={getFlowerImage(imageVariant)} contentFit="contain" style={styles.thumbImage} />
+        </View>
+        <View style={styles.recordCopy}>
+          <Text style={styles.recordTitle}>{flower.name}</Text>
+          <Text style={styles.recordDate}>첫 개화 {formatFullDate(flower.date)}</Text>
+          <Text style={styles.recordMeta}>완료 {flower.completions}개 · 꽃 {monthOrder}송이</Text>
+        </View>
         <Text style={styles.arrow}>›</Text>
       </Pressable>
     </Link>
