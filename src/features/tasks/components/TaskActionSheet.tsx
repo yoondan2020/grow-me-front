@@ -13,10 +13,38 @@ export function TaskActionSheet({ mode, taskTitle, onEdit, onRequestDelete, onCo
   return (
     <>
       <Modal transparent visible={mode === 'actions'} animationType="fade" onRequestClose={onClose}>
-        <View style={styles.modalBackdrop}><Pressable style={StyleSheet.absoluteFill} onPress={onClose} /><View style={styles.actionSheet}><Text style={styles.actionSheetTitle}>{taskTitle}</Text><Pressable onPress={onEdit} style={styles.actionRow}><Text style={styles.actionText}>수정하기</Text></Pressable><Pressable onPress={onRequestDelete} style={styles.actionRow}><Text style={styles.deleteText}>삭제하기</Text></Pressable><Pressable onPress={onClose} style={styles.actionRow}><Text style={styles.actionText}>취소</Text></Pressable></View></View>
+        <View style={styles.modalBackdrop}>
+          <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
+          <View style={styles.actionSheet}>
+            <Text style={styles.actionSheetTitle}>{taskTitle}</Text>
+            <Pressable onPress={onEdit} style={styles.actionRow}>
+              <Text style={styles.actionText}>수정하기</Text>
+            </Pressable>
+            <Pressable onPress={onRequestDelete} style={styles.actionRow}>
+              <Text style={styles.deleteText}>삭제하기</Text>
+            </Pressable>
+            <Pressable onPress={onClose} style={styles.actionRow}>
+              <Text style={styles.actionText}>취소</Text>
+            </Pressable>
+          </View>
+
+        </View>
       </Modal>
       <Modal transparent visible={mode === 'delete'} animationType="fade" onRequestClose={onClose}>
-        <View style={styles.modalBackdrop}><View style={styles.confirm}><Text style={styles.confirmTitle}>할 일을 삭제할까요?</Text><Text style={styles.confirmCopy}>삭제한 할 일은 복구할 수 없어요.{ '\n' }이미 피어난 꽃은 도감에 남아 있어요.</Text><View style={styles.confirmActions}><Pressable onPress={onClose} style={styles.cancel}><Text style={styles.actionText}>취소</Text></Pressable><Pressable onPress={onConfirmDelete} style={styles.deleteButton}><Text style={styles.deleteButtonText}>삭제</Text></Pressable></View></View></View>
+        <View style={styles.modalBackdrop}>
+          <View style={styles.confirm}>
+            <Text style={styles.confirmTitle}>할 일을 삭제할까요?</Text>
+            <Text style={styles.confirmCopy}>삭제한 할 일은 복구할 수 없어요.{'\n'}이미 피어난 꽃은 도감에 남아 있어요.</Text>
+            <View style={styles.confirmActions}>
+              <Pressable onPress={onClose} style={styles.cancel}>
+                <Text style={styles.actionText}>취소</Text>
+              </Pressable>
+              <Pressable onPress={onConfirmDelete} style={styles.deleteButton}>
+                <Text style={styles.deleteButtonText}>삭제</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
       </Modal>
     </>
   );

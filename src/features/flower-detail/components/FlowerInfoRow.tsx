@@ -1,7 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 export function FlowerInfoRow({ label, value }: { label: string; value: string }) {
-  return <View style={styles.infoRow}><Text style={styles.infoLabel}>{label}</Text><Text style={styles.infoValue}>{value}</Text></View>;
+  return <View style={styles.infoRow}>
+    <Text style={styles.infoLabel}>{label}</Text>
+    <Text style={styles.infoValue}>{value}</Text>
+  </View>;
 }
 
 const styles = StyleSheet.create({

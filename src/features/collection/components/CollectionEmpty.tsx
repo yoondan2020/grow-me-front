@@ -6,10 +6,14 @@ import { ActionButton } from '@/components/ui/ActionButton';
 export function CollectionEmpty({ onStart }: { onStart: () => void }) {
   return (
     <>
-      <View style={styles.summaryEmpty}><Text style={styles.summaryLabel}>지금까지 모은 꽃</Text><Text style={styles.summaryValue}>0 송이</Text></View>
-      <View style={styles.emptyArt}><Image source={require('@/assets/images/growme/collection-seedling.png')} contentFit="contain" style={styles.emptyImage} /></View>
+      <View style={styles.summaryEmpty}><Text style={styles.summaryLabel}>지금까지 모은 꽃</Text>
+        <Text style={styles.summaryValue}>0 송이</Text>
+      </View>
+      <View style={styles.emptyArt}>
+        <Image source={require('@/assets/images/growme/collection-seedling.png')} contentFit="contain" style={styles.emptyImage} />
+      </View>
       <Text style={styles.emptyTitle}>첫 꽃을 기다리고 있어요</Text>
-      <Text style={styles.emptyCopy}>한 달 동안 할 일 20개를 완료하면{ '\n' }나만의 첫 꽃이 도감에 기록돼요.</Text>
+      <Text style={styles.emptyCopy}>한 달 동안 할 일 20개를 완료하면{'\n'}나만의 첫 꽃이 도감에 기록돼요.</Text>
       <ActionButton style={styles.actionMargin} label="첫 꽃 키우러 가기" onPress={onStart} />
     </>
   );
